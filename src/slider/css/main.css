@@ -1,0 +1,77 @@
+/* -------------------------------- */
+/* -- react-minimal-slider 0.0.1 -- */
+/* -------------------------------- */
+.minimal-slider {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+.minimal-slider * {
+  box-sizing: border-box;
+}
+.minimal-slider__container {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  direction: rtl;
+}
+.minimal-slider__track {
+  position: relative;
+  display: flex;
+  align-items: center;
+  will-change: transform;
+  user-select: none;
+  margin: 0;
+  padding: 0;
+}
+.minimal-slider__track--transition {
+  transition: transform 0.3s;
+  -webkit-transition: transform 0.3s;
+  -moz-transition: transform 0.3s;
+  -ms-transition: transform 0.3s;
+  -o-transition: transform 0.3s;
+}
+.minimal-slider__item > * {
+  width: auto !important;
+}
+.minimal-slider__right-arrow,
+.minimal-slider__left-arrow {
+  position: absolute;
+  cursor: pointer;
+  top: 50%;
+  transform: translateY(-50%);
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  -o-transform: translateY(-50%);
+  z-index: 1;
+  user-select: none;
+}
+.minimal-slider__right-arrow {
+  right: -45px;
+}
+.minimal-slider__left-arrow {
+  left: -45px;
+}
+.minimal-slider__bullets-container {
+  width: 100%;
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: center;
+}
+.minimal-slider__bullet {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin: 0 5px;
+  border-radius: 50%;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
+  -o-border-radius: 50%;
+  background-color: #e5e5e5;
+  cursor: pointer;
+}
+.minimal-slider__bullet--active {
+  background-color: #bfbfbf;
+}
