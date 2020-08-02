@@ -4,18 +4,17 @@
 .minimal-slider {
   position: relative;
   width: 100%;
-  box-sizing: border-box;
-}
-.minimal-slider * {
-  box-sizing: border-box;
+  height: 100%;
 }
 .minimal-slider__container {
   width: 100%;
+  height: 100%;
   overflow: hidden;
   position: relative;
   direction: rtl;
 }
 .minimal-slider__track {
+  height: 100%;
   position: relative;
   display: flex;
   align-items: center;
@@ -31,8 +30,11 @@
   -ms-transition: transform 0.3s;
   -o-transition: transform 0.3s;
 }
+.minimal-slider__item {
+  height: 100%;
+}
 .minimal-slider__item > * {
-  width: auto !important;
+  width: 100% !important;
 }
 .minimal-slider__right-arrow,
 .minimal-slider__left-arrow {

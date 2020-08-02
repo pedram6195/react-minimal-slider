@@ -33,6 +33,18 @@ const Slider = ({ children, options }) => {
     ...options
   };
 
+  // assigning children to state
+  const [ch, setch] = useState(null);
+
+  // creating new children array (or null if empty)
+  useEffect(() => {
+    if (!children || children?.length === 0) {
+      setch(null);
+    } else if (!Array.isArray(children))
+      setch(React.Children.toArray(children));
+    else setch(children);
+  }, [children]);
+
   // slides container & track elements
   const container = useRef();
   const track = useRef();
@@ -44,19 +56,20 @@ const Slider = ({ children, options }) => {
   const [positions, setPositions] = useState([]);
 
   useEffect(() => {
-    if (container.current) {
+    if (container.current && ch) {
       let w = Math.ceil(container.current.offsetWidth / itemsToShow);
       setItemWidth(w);
-      setMaxTranslate((children.length - itemsToShow) * w);
-      children.forEach((el, index) => {
+      setMaxTranslate((ch?.length - itemsToShow) * w);
+      ch.forEach((el, index) => {
         setPositions(positions => [...positions, index * w]);
       });
     }
-  }, [children, itemsToShow]);
+  }, [ch, itemsToShow]);
 
   // moving slider by translate by px
-  const changeTranslate = amount => {
+  const changeTranslate = (amount, flag = true) => {
     track.current.style.transform = `translateX(${amount}px)`;
+    if (flag) setTranslate(amount);
   };
 
   const [isDown, setIsDown] = useState(false);
@@ -80,7 +93,7 @@ const Slider = ({ children, options }) => {
     else pageX = e.pageX;
     w = pageX - container.current.offsetLeft - startX;
     if (translate + w >= 0 && translate + w <= maxTranslate) {
-      changeTranslate(translate + w);
+      changeTranslate(translate + w, false);
       setWalk(w);
     }
   };
@@ -89,14 +102,13 @@ const Slider = ({ children, options }) => {
     track.current.classList.add("minimal-slider__track--transition");
     let shouldGo = closest(translate + walk, positions);
     changeTranslate(shouldGo);
-    setTranslate(shouldGo);
     setCurrentSlide(positions.indexOf(shouldGo) + 1);
     setIsDown(false);
     setWalk(0);
   };
 
   useEffect(() => {
-    if (container && draggable) {
+    if (container && draggable && ch) {
       const slider = container.current;
       slider.addEventListener("mousedown", dragStart);
       slider.addEventListener("touchstart", dragStart);
@@ -121,88 +133,87 @@ const Slider = ({ children, options }) => {
     if (translate - itemWidth < 0) return;
     track.current.classList.add("minimal-slider__track--transition");
     changeTranslate(translate - itemWidth);
-    setTranslate(translate - itemWidth);
   };
   const moveLeft = () => {
     if (translate + itemWidth > maxTranslate) return;
     track.current.classList.add("minimal-slider__track--transition");
     changeTranslate(translate + itemWidth);
-    setTranslate(translate + itemWidth);
   };
 
-  useEffect(() => {
-    console.log("translate", translate);
-  }, [translate]);
+  // useEffect(() => {
+  //   console.log("translate", translate);
+  // }, [translate]);
+
+  // useEffect(() => {
+  //   console.log("isDown", isDown);
+  // }, [isDown]);
+
+  // useEffect(() => {
+  //   console.log("startX", startX);
+  // }, [startX]);
+
+  // useEffect(() => {
+  //   console.log("walk", walk);
+  // }, [walk]);
 
   useEffect(() => {
-    console.log("isDown", isDown);
-  }, [isDown]);
+    if (ch) changeTranslate(positions[currentSlide - 1]);
+  }, [currentSlide, positions, ch]);
 
-  useEffect(() => {
-    console.log("startX", startX);
-  }, [startX]);
-
-  useEffect(() => {
-    console.log("walk", walk);
-  }, [walk]);
-
-  useEffect(() => {
-    changeTranslate(positions[currentSlide - 1]);
-    setTranslate(positions[currentSlide - 1]);
-  }, [currentSlide, positions]);
-
-  return (
-    <div className="minimal-slider">
-      <div className="minimal-slider__container" ref={container}>
-        <div
-          className="minimal-slider__track"
-          ref={track}
-          style={{
-            width: itemWidth > 0 ? itemWidth * children.length : "auto"
-          }}
-        >
-          {children?.map((item, index) => (
-            <div
-              className="minimal-slider__item"
-              key={index}
-              style={{ padding: `0 ${spaceBetween / 2}px`, width: itemWidth }}
-            >
-              {item}
-            </div>
-          ))}
+  if (!ch) return null;
+  else
+    return (
+      <div className="minimal-slider">
+        <div className="minimal-slider__container" ref={container}>
+          <div
+            className="minimal-slider__track"
+            ref={track}
+            style={{
+              width: itemWidth > 0 ? itemWidth * ch?.length : "auto"
+            }}
+          >
+            {ch?.map((item, index) => (
+              <div
+                className="minimal-slider__item"
+                key={index}
+                style={{ padding: `0 ${spaceBetween / 2}px`, width: itemWidth }}
+              >
+                {item}
+              </div>
+            ))}
+          </div>
         </div>
+
+        {showBullets && ch.length > 1 && (
+          <div className="minimal-slider__bullets-container">
+            {ch.map((item, index) => (
+              <span
+                key={index}
+                className={`minimal-slider__bullet ${
+                  index + 1 === currentSlide
+                    ? "minimal-slider__bullet--active"
+                    : ""
+                }`}
+                onClick={() => setCurrentSlide(index + 1)}
+              ></span>
+            ))}
+          </div>
+        )}
+
+        {showArrows && (
+          <>
+            <ArrowRight
+              className="minimal-slider__right-arrow"
+              onClick={moveRight}
+            />
+            <ArrowLeft
+              className="minimal-slider__left-arrow"
+              onClick={moveLeft}
+            />
+          </>
+        )}
       </div>
-
-      {showBullets && (
-        <div className="minimal-slider__bullets-container">
-          {children.map((item, index) => (
-            <span
-              key={index}
-              className={`minimal-slider__bullet ${
-                index + 1 === currentSlide
-                  ? "minimal-slider__bullet--active"
-                  : ""
-              }`}
-              onClick={() => setCurrentSlide(index + 1)}
-            ></span>
-          ))}
-        </div>
-      )}
-
-      {showArrows && (
-        <>
-          <ArrowRight
-            className="minimal-slider__right-arrow"
-            onClick={moveRight}
-          />
-          <ArrowLeft
-            className="minimal-slider__left-arrow"
-            onClick={moveLeft}
-          />
-        </>
-      )}
-    </div>
-  );
+    );
 };
 
 export default Slider;
